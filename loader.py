@@ -103,7 +103,14 @@ M_DND = "<:M_DND:1462263493905354835>"
 B_Info = "<:B_Info:1461446330470891787>"
 B_BotIcon = "<:B_Bot:1461405137359736903>"
 
+# stats
+B_BotSTAT = "<:B_BotSTAT:1462295033716670608>"
+B_WebSTAT = "<:SE_WebSTAT:1462295032017981645>"
+B_InfoSTAT = "<:SE_InfoSTAT:1462295023377846292>"
+S_ManagerSTAT = "<:S_ManagerSTAT:1462296245811937301>"
+
 R_Booster = "<:R_Booster:1462260261883875378>"
+R_Cont = "<:R_Contributor:1462278184379875481>"
 # Colors
 RED = "\033[31m"
 GREEN = "\033[32m"
@@ -859,15 +866,15 @@ async def ping(interaction: discord.Interaction):
     if latency < 100:
         color = 0xf6d98e
         status = "Отлично"
-        emoji = "🟢"
+        emoji = f"{SE_PingGood}"
     elif latency < 300:
         color = 0xf6d98e
         status = "Нормально"
-        emoji = "🟡"
+        emoji = f"{SE_PingNormal}"
     else:
         color = 0xf6d98e
         status = "Медленно"
-        emoji = "🔴"
+        emoji = f"{SE_PingBad}"
     
     embed = discord.Embed(
         title=f"{emoji} Понг!",
@@ -875,27 +882,40 @@ async def ping(interaction: discord.Interaction):
         timestamp=datetime.now(timezone.utc)
     )
     
-    embed.add_field(name="Задержка", value=f"{latency}ms ({status})", inline=True)
+    embed.add_field(
+        name=f"> {SE_Web} • Задержка",
+        value=f"> {emoji} • {latency}ms ({status})",
+        inline=True
+    )
     
     if days > 0:
         uptime_str = f"{days}д {hours}ч {minutes}м"
     else:
         uptime_str = f"{hours}ч {minutes}м {seconds}с"
     
-    embed.add_field(name="Время работы", value=uptime_str, inline=True)
-    embed.add_field(name="Серверов", value=str(len(bot.guilds)), inline=True)
+    embed.add_field(
+        name=f"> {B_Info} • Время работы",
+        value=f"> {uptime_str}",
+        inline=True
+    )
+
+    embed.add_field(
+        name=f"> {SE_Home} Серверов",
+        value=f"> {str(len(bot.guilds))}",
+        inline=True
+    )
     
-    # Добавляем статистику использования команд
     total_commands = sum(bot.command_usage.values()) if bot.command_usage else 0
     if total_commands > 0:
         most_used = max(bot.command_usage, key=bot.command_usage.get) if bot.command_usage else "нет"
+
         embed.add_field(
-            name="Статистика команд",
-            value=f"Всего: {total_commands}\nЧаще всего: `/{most_used}`",
+            name=f"> {B_Info} • Статистика команд",
+            value=f"> Всего: {total_commands}\nЧаще всего: `/{most_used}`",
             inline=False
         )
     
-    embed.set_footer(text=f"Запросил: {interaction.user.name}", icon_url=interaction.user.display_avatar.url)
+#    embed.set_footer(text=f"Запросил: {interaction.user.name}", icon_url=interaction.user.display_avatar.url)
     
     await interaction.response.send_message(embed=embed)
     
@@ -907,139 +927,49 @@ async def ping(interaction: discord.Interaction):
 @cmd_check() # чек включен ли он или нет
 async def help_command(interaction: discord.Interaction):
     embed = discord.Embed(
-        title=f"{B_BotIcon} Все Команды SEA_bot",
+        title=f"{B_BotSTAT} • Все Команды бота",
         description="*Доступные команды для использования*",
         color=0xf6d98e
     )
     
-    # Основные команды
     embed.add_field(
-        name="🎮 Основные",
+        name=f"{SE_IdkReally} • Основные",
         value=(
-            "• `/ping` - Проверить статус бота\n"
-            "• `/help` - Эта справка\n"
-            "• `/mcplayers` - Кто онлайн на сервере\n"
-            "• `/roleinfo` - Инфо об авто-роли\n"
-            "• `/serverinfo` - Инфо о сервере Discord\n"
-            "• `/userinfo` - Инфо о пользователе\n"
-            "• `/botstats` - Статистика бота"
+            "• ***/ping** - Проверить статус бота*\n"
+            "• ***/help** - Эта справка*\n"
+            "• ***/roleinfo** - Инфо об авто-роли*\n"
+            "• ***/serverinfo** - Инфо о сервере Discord*\n"
+            "• ***/userinfo** - Инфо о пользователе*\n"
+            "• ***/botstats** - Статистика бота*"
+            "• ***/random** - Случайный выбор*"
         ),
         inline=False
     )
     
-    # Админские команды
     if is_allowed_user(interaction.user.id):
         embed.add_field(
-            name="⚙️ Админские",
+            name=f"{S_Manager} • Админские",
             value=(
-                "• `/autorole` - Настроить авто-роль\n"
-                "• `/setwelcome` - Канал для приветствий\n"
-                "• `/setmcstats` - Канал для статистики\n"
-                "• `/mcsetip` - Изменить IP сервера\n"
-                "• `/speak` - Отправить сообщение\n"
-                "• `/fixeveryone` - Выдать роль всем\n"
-                "• `/reactionrole` - Создать реакцию-роль\n"
-                "• `/clean` - Очистить сообщения\n"
-                "• `/slowmode` - Установить медленный режим"
+                "• ***/autorole** - Настроить авто-роль*\n"
+                "• ***/setwelcome** - Канал для приветствий*\n"
+                "• ***/setmcstats** - Канал для статистики*\n"
+                "• ***/mcsetip** - Изменить IP сервера*\n"
+                "• ***/speak** - Отправить сообщение*\n"
+                "• ***/fixeveryone** - Выдать роль всем*\n"
+                "• ***/reactionrole** - Создать реакцию-роль*\n"
+                "• ***/clean** - Очистить сообщения*\n"
+                "• ***/slowmode** - Установить медленный режим*"
             ),
             inline=False
         )
     
-    # Развлекательные
-    embed.add_field(
-        name="🎲 Развлекательные",
-        value=(
-            "• `/poll` - Создать опрос\n"
-            "• `/random` - Случайный выбор"
-        ),
-        inline=False
-    )
-    
-    embed.set_footer(text=f"Всего команд: {len(bot.tree.get_commands())} | Используй /help")
+    embed.set_footer(text=f"Всего команд: {len(bot.tree.get_commands())} • Используй /help")
     
     await interaction.response.send_message(embed=embed, ephemeral=True)
     
     # Логируем использование
     bot.command_usage["help"] = bot.command_usage.get("help", 0) + 1
-    logger.info(f"[🟩] help от {interaction.user}")  
-
-@bot.tree.command(name="mcplayers", description="игроки онлайн")
-async def mc_players(interaction: discord.Interaction):
-    config = load_config()
-    server_ip = config.get("mc_server_ip", "d2.skynodes.net:25007")
-
-    await interaction.response.defer()
-
-    try:
-        server = JavaServer.lookup(server_ip)
-        status = server.status()
-
-        def format_ping_bar(ping_ms):
-            if ping_ms < 100:
-                quality = "Хорошо"
-                bar = "█ █ █"
-                embed_color = 0xf6d98e
-            elif ping_ms < 300:
-                quality = "Нормально"
-                bar = "░ ░ ░"
-                embed_color = 0xf6d98e
-            else:
-                quality = "Медленно"
-                bar = "▒ ▒ ▒"
-                embed_color = 0xf6d98e
-
-            return f"**{ping_ms:.0f}ms**\n`{bar}` [{quality}]", embed_color
-
-        ping_str, embed_color = format_ping_bar(status.latency)
-
-        embed = discord.Embed(
-            title=f"{B_Info} MC STATUS",
-            color=embed_color,
-            timestamp=datetime.now(timezone.utc)
-        )
-
-        embed.add_field(name=f"{M_3} Игроки", value=f"{status.players.online}/{status.players.max}", inline=True)
-        embed.add_field(name="Пинг", value=ping_str, inline=True)
-        
-        # Версия сервера
-        if status.version:
-            embed.add_field(name="Версия", value=status.version.name, inline=True)
-
-        if status.players.sample:
-            players = [p.name for p in status.players.sample]
-            player_list = "\n".join([f"• {player}" for player in players[:15]])
-            if len(players) > 15:
-                player_list += f"\n*... и ещё {len(players) - 15}*"
-            embed.add_field(name="🎮 Онлайн игроки", value=player_list, inline=False)
-        else:
-            embed.add_field(name="🎮 Онлайн", value="Никого нет 😢", inline=False)
-            
-        # MOTD
-        if status.description:
-            motd = str(status.description).strip()
-            if motd and motd != "null":
-                clean_motd = re.sub(r'§[0-9a-fk-or]', '', motd)
-                if len(clean_motd) > 0:
-                    embed.add_field(name="📝 Описание", value=f"*{clean_motd[:150]}*", inline=False)
-
-        embed.set_footer(text=f"{status.version.name} | {server_ip} | /mcplayers")
-        await interaction.followup.send(embed=embed)
-        
-        # Логируем использование
-        bot.command_usage["mcplayers"] = bot.command_usage.get("mcplayers", 0) + 1
-        logger.info(f"[🟩] mcplayers от {interaction.user}")
-
-    except Exception as e:
-        error_msg = str(e)[:100]
-        embed = discord.Embed(
-            title="❌ Ошибка подключения",
-            description=f"Не удалось подключиться к серверу `{server_ip}`",
-            color=0xff4444
-        )
-        embed.add_field(name="Ошибка", value=f"```{error_msg}```", inline=False)
-        embed.set_footer(text="Проверьте правильность IP-адреса")
-        await interaction.followup.send(embed=embed)
-        logger.error(f"[🟥] mcplayers error: {e}")
+    logger.info(f"[🟩] help от {interaction.user}")
 
 @bot.tree.command(name="roleinfo", description="статус авторолки")
 @cmd_check() # чек включен ли он или нет
@@ -1201,150 +1131,166 @@ async def server_info(interaction: discord.Interaction):
 @app_commands.describe(user="/userinfo <@username or just /userinfo for your information>")
 @cmd_check() # чек включен ли он или нет
 async def user_info(interaction: discord.Interaction, user: Optional[discord.Member] = None):
-
+    
     target = user or interaction.user
-    
-    async def get_actual_status(member_or_user):
-        if isinstance(member_or_user, discord.Member) and member_or_user.guild == interaction.guild:
-            return member_or_user.status
-        
-        guild_member = interaction.guild.get_member(member_or_user.id)
-        if guild_member:
-            return guild_member.status
-        
-        try:
-            fetched = await interaction.guild.fetch_member(member_or_user.id)
-            return fetched.status
-        except discord.NotFound:
-            return discord.Status.offline
-        except Exception as e:
-            logger.warning(f"[🟨] Ошибка получения статуса для {member_or_user}: {e}")
-            return discord.Status.offline
+    guild_member = None
+    user_icon = M_1
+    OwnRole_ID = 1453929108235878563
+    DevRole_ID = 1453929079110893660
+    AdmRole_ID = 1461063865008918762
+    ModRole_ID = 1453929156566843493
+    BoostRole_ID = 1461087418630279259
+    is_nitro = False
 
-    actual_status = await get_actual_status(target)
-
-    status_emojis = {
-        discord.Status.online: f"{M_ONLINE} Онлайн",
-        discord.Status.idle: f"{M_AFK} Неактивен", 
-        discord.Status.dnd: f"{M_DND} Не Беспокоить",
-        discord.Status.offline: f"{M_1} Оффлайн",
-        discord.Status.do_not_disturb: f"{M_DND} Не Беспокоить"
-    }
-
-    status_display = status_emojis.get(actual_status, f"{M_1} Оффлайн")
-
-    activity_text = "Нет активности"
-    if target.activities:
-        activities = []
-        for activity in target.activities:
-            if isinstance(activity, discord.Game):
-                activities.append(f"Играет в **{activity.name}**")
-            elif isinstance(activity, discord.Streaming):
-                activities.append(f"Стримит **{activity.name}**")
-            elif isinstance(activity, discord.Spotify):
-                activities.append(f"Слушает **{activity.title}** от **{activity.artist}**")
-        activity_text = f"{B_Info} • " + " • ".join(activities[:2])
-        if len(target.activities) > 2:
-            activity_text += f" +{len(target.activities)-2}"
-
+    status_display = f"> {M_1} *Оффлайн*" # дефолтное значение, затычка крч
     user_color = target.color if target.color.value != 0 else 0xf6d98e
+
+    if hasattr(target, 'roles'):
+        # я
+        if any(role.id == OwnRole_ID for role in target.roles):
+            user_icon = S_Root
+        # разраб
+        elif any(role.id == DevRole_ID for role in target.roles):
+            user_icon = S_Manager
+        # адм
+        elif any(role.id == AdmRole_ID for role in target.roles):
+            user_icon = S_Admin
+        # модер
+        elif any(role.id == ModRole_ID for role in target.roles):
+            user_icon = S_Staff
+        # бустер
+        elif any(role.id == BoostRole_ID for role in target.roles):
+            user_icon = R_Booster
+
+    try:
+        api_user = await bot.fetch_user(target.id)
+        
+        guild_member = interaction.guild.get_member(target.id)
+        if guild_member:
+            target = guild_member
+        else:
+            target = api_user
+    except:
+        api_user = target
     
+# создание базы для эмбеда
     embed = discord.Embed(
-        title=f"{M_1} {target.display_name}",
-        color=user_color,
-        timestamp=datetime.now(timezone.utc)
+        title = f"{user_icon} {target.display_name}",
+        description = "", 
+        color = user_color,
+        timestamp = datetime.now(timezone.utc)
     )
+
+    embed.add_field(
+        name = f"> {SE_Welcome} • Зашёл", 
+        value = target.joined_at.strftime("> *%d.%m.%Y %H:%M*"),
+        inline = True
+    )
+    
+    embed.add_field(
+        name = f"> {SE_Home} • Создан", 
+        value = target.created_at.strftime("> *%d.%m.%Y %H:%M*"),
+        inline = True
+    )
+
+    if hasattr(target, 'roles'):
+        roles = [role.mention for role in sorted(target.roles[1:], key=lambda x: x.position, reverse=True)]
+        if roles:
+            roles_text = " ".join(roles[:7])
+            if len(roles) > 7:
+                roles_text += f" *и ещё {len(roles) - 7}*"
+        else:
+            roles_text = "*Нет ролей*"
+        
+        embed.add_field(
+            name = f"> {SE_Role} • Роли ({len(roles)})",
+            value = f"> {roles_text}",
+            inline = False
+        )
     
     embed.set_thumbnail(url=target.display_avatar.url)
+#    embed.add_field(name=f"{M_1} Имя пользователя", value=f"{target.name}", inline=True)
+    embed.add_field(name = f"> {SE_Web} ID", value=f"> {target.id}", inline = True)
+#    embed.add_field(name = f"> {SE_Web} Статус", value=status_display, inline = False)
     
-#    embed.add_field(
-#        name=f"{M_1} Имя пользователя",
-#        value=f"{target.name}",
-#        inline=True
-#    )
+    activity_text = "> CURRENTLY IN ACTIVE DEVELOPMENT"
+    if hasattr(target, 'activities') and target.activities:
+        for activity in target.activities:
+            if isinstance(activity, discord.Game):
+                activity_text = f"> *Играет в {activity.name}*"
+                break
+            elif isinstance(activity, discord.Streaming):
+                activity_text = f"> *Стримит [{activity.name}]({activity.url})*"
+                break
+            elif isinstance(activity, discord.Spotify):
+                activity_text = f"> *Слушает {activity.title} - {activity.artist}*"
+                break
+            elif isinstance(activity, discord.CustomActivity):
+                if activity.name:
+                    emoji_text = f"{activity.emoji} " if activity.emoji else ""
+                    activity_text = f"> *{emoji_text}{activity.name}*"
+                break
 
-    embed.add_field(
-        name=f"{SE_Web} ID",
-        value=f"{target.id}",
-        inline=True
-    )
+#    embed.add_field(name=f"> {SE_IdkReally} • Активность", value=activity_text, inline=True)
 
-    embed.add_field(
-        name=f"{SE_Web} Статус",
-        value=status_display,
-        inline=True
-    )
+    banner_user = api_user if hasattr(api_user, 'banner') else target
+    if hasattr(banner_user, 'banner') and banner_user.banner:
+        embed.set_image(url=banner_user.banner.url)
     
-    embed.add_field(
-        name=f"> {SE_Welcome} Присоединился", 
-        value=target.joined_at.strftime("%d.%m.%Y %H:%M"),
-        inline=True
-    )
-    
-    embed.add_field(
-        name=f"> {SE_Home} Cоздан", 
-        value=target.created_at.strftime("%d.%m.%Y %H:%M"),
-        inline=True
-    )
-    
-    roles = [role.mention for role in target.roles[1:]]  # Исключаем @everyone
-    if roles:
-        roles_text = " ".join(roles[:7])
-        if len(roles) > 7:
-            roles_text += f" *и ещё {len(roles) - 7}*"
-    else:
-        roles_text = "Нет ролей"
-    
-    embed.add_field(
-        name=f"> {SE_Role} Роли ({len(roles)})",
-        value=roles_text,
-        inline=False
-    )
-
-    embed.add_field(
-        name=f"> {SE_IdkReally} Активность",
-        value=activity_text,
-        inline=True
-    )
-    
-#    embed.add_field(
-#        name="📊 Дополнительно",
-#        value=(
-#            f"🤖 Бот: {'✅ Да' if target.bot else '❌ Нет'}\n"
-#            f"🎨 Цвет: `{str(target.color)}`\n"
-#            f"📋 Никнейм: `{target.nick or 'Нет'}`"
-#        ),
-#        inline=True
-#    )
-    
-    # Баннер пользователя (если есть)
-    if target.banner:
-        embed.set_image(url=target.banner.url)
-    
-    # Значки пользователя (если есть)
     badges = []
-    if target.public_flags.staff:
-        badges.append(f"{S_Staff} Discord Staff")
-    if target.public_flags.partner:
-        badges.append(f"{P_OTHER} Discord Partner")
-    if target.public_flags.hypesquad:
-        badges.append("HypeSquad Events")
-    if target.public_flags.bug_hunter:
-        badges.append("Bug Hunter")
-    if target.public_flags.bug_hunter_level_2:
-        badges.append("Bug Hunter Level 2")
-    if target.public_flags.early_supporter:
-        badges.append(f"{SE_PingGood} Early Supporter")
+    
+    flags = target.public_flags.all()
+    for flag in flags:
+        if flag == discord.UserFlags.staff:
+            badges.append(f"{S_Staff} *Discord Staff*")
+        elif flag == discord.UserFlags.partner:
+            badges.append(f"{P_OTHER} *Partner Server Owner*")
+        elif flag == discord.UserFlags.hypesquad:
+            badges.append(f"{SE_IdkReally} *HypeSquad Events*")
+        elif flag == discord.UserFlags.hypesquad_balance:
+            badges.append(f"{SE_Home} *HypeSquad Balance*")
+        elif flag == discord.UserFlags.hypesquad_bravery:
+            badges.append(f"{SE_Home} *HypeSquad Bravery*")
+        elif flag == discord.UserFlags.hypesquad_brilliance:
+            badges.append(f"{SE_Home} *HypeSquad Brilliance*")
+        elif flag == discord.UserFlags.bug_hunter:
+            badges.append(f"{SE_IdkReally} *Bug Hunter*")
+        elif flag == discord.UserFlags.bug_hunter_level_2:
+            badges.append(f"{SE_IdkReally} *Bug Hunter Level 2*")
+        elif flag == discord.UserFlags.early_supporter:
+            badges.append(f"{SE_PingGood} *Early Supporter*")
+        elif flag == discord.UserFlags.verified_bot_developer:
+            badges.append(f"{S_Manager} *Verified Bot Developer*")
+        elif flag == discord.UserFlags.early_verified_bot_developer:
+            badges.append(f"{S_Manager} *Early Verified Bot Developer*")
+    
+    if hasattr(target, 'public_flags') and target.public_flags.active_developer:
+        badges.append(f"{R_Cont} **Active Developer*")
+    
+    
+    if hasattr(target, 'premium_since') and target.premium_since:
+        is_nitro = True
+        badges.append(f"{R_Cont} *Nitro Subscriber*")
+    
+    elif hasattr(banner_user, 'banner') and banner_user.banner:
+        is_nitro = True
+        badges.append(f"{R_Cont} *Nitro Subscriber*")
+    
+    if str(target.avatar).startswith("a_"):
+        is_nitro = True
+        if not any("Nitro" in badge for badge in badges):
+            badges.append(f"{R_Cont} *Nitro Subscriber*")
     
     if badges:
+        bwa = [f"> {badge}" for badge in badges]
         embed.add_field(
-            name=f"> {SE_Web} Badges",
-            value="\n".join(badges),
+            name=f"> {SE_Web} • Бейджи ({len(badges)})",
+            value="\n".join(bwa),
             inline=True
         )
     
-    embed.set_footer(text=f"Запросил: {interaction.user.name}", icon_url=interaction.user.display_avatar.url)
-    
+    #embed.set_footer(text=f"• Запросил: {interaction.user.name}", icon_url=interaction.user.display_avatar.url)
+
     await interaction.response.send_message(embed=embed)
     
     bot.command_usage["userinfo"] = bot.command_usage.get("userinfo", 0) + 1
@@ -1366,42 +1312,42 @@ async def bot_stats(interaction: discord.Interaction):
     disk_usage = psutil.disk_usage('/').percent
     
     embed = discord.Embed(
-        title=f"{B_BotIcon} Статистика SEA_bot",
-        description="*Подробная информация о работе бота*",
+        title=f"{B_BotSTAT} Статистика бота",
+        description = "", 
         color=0xf6d98e,
         timestamp=datetime.now(timezone.utc)
     )
     
     embed.add_field(
-        name="Bot Stats",
+        name=f"> {B_InfoSTAT} • Bot Stats",
         value=(
-            f"Серверов: **{len(bot.guilds)}**\n"
-            f"Пинг: **{round(bot.latency * 1000)}ms**\n"
-            f"Время работы: **{days}д {hours}ч {minutes}м**\n"
-            f"Версия бота: **v5.3**"
+            f"> {B_WebSTAT} • Серверов: **{len(bot.guilds)}**\n"
+            f"> {B_WebSTAT} • Пинг: **{round(bot.latency * 1000)}ms**\n"
+            f"> {B_WebSTAT} • Время работы: **{days}д {hours}ч {minutes}м**\n"
+            f"> {B_WebSTAT} • Версия бота: **v5.3**"
         ),
         inline=True
     )
     
     embed.add_field(
-        name="MC Stats",
+        name=f"> {B_InfoSTAT} MC Stats",
         value=(
-            f"Статус: **{f'{SE_PingGood} Вкл' if mc_stats['is_running'] else f'{SE_PingBad} Выкл'}**\n"
-            f"Сервер: **{f'{SE_PingGood} Онлайн' if mc_stats['is_online'] else f'{SE_PingBad} Оффлайн'}**\n"
-            f"Обновлений: **{mc_stats['total_updates']}**\n"
-            f"Успешных: **{mc_stats['success_rate']:.1f}%**"
+            f"> {S_ManagerSTAT} • Статус: **{f'{SE_PingGood} Вкл' if mc_stats['is_running'] else f'{SE_PingBad} Выкл'}**\n"
+            f"> {S_ManagerSTAT} • Сервер: **{f'{SE_PingGood} Онлайн' if mc_stats['is_online'] else f'{SE_PingBad} Оффлайн'}**\n"
+            f"> {S_ManagerSTAT} • Обновлений: **{mc_stats['total_updates']}**\n"
+            f"> {S_ManagerSTAT} • Успешных: **{mc_stats['success_rate']:.1f}%**"
         ),
         inline=True
     )
     
     # Системная информация
     embed.add_field(
-        name="SEA Server Stats",
+        name=f"> {B_InfoSTAT} • SEA Server Stats",
         value=(
-            f"ЦП: **{cpu_percent}%**\n"
-            f"Память: **{memory:.1f} MB**\n"
-            f"Диск: **{disk_usage}%**\n"
-            f"Платформа: **{platform.system()}**"
+            f"> {S_ManagerSTAT} • ЦП: **{cpu_percent}%**\n"
+            f"> {S_ManagerSTAT} • Память: **{memory:.1f} MB**\n"
+            f"> {S_ManagerSTAT} • Диск: **{disk_usage}%**\n"
+            f"> {S_ManagerSTAT} • Платформа: **{platform.system()}**"
         ),
         inline=True
     )
@@ -1413,44 +1359,44 @@ async def bot_stats(interaction: discord.Interaction):
         least_used = min(bot.command_usage, key=bot.command_usage.get) if bot.command_usage else "нет"
         
         embed.add_field(
-            name="CMD Stats",
+            name=f"> {B_InfoSTAT} • CMD Stats",
             value=(
-                f"Всего вызовов: **{total_commands}**\n"
-                f"Чаще всего: `/{most_used}`\n"
-                f"Редко: `/{least_used}`\n"
-                f"Уникальных: **{len(bot.command_usage)}**"
+                f"> {S_ManagerSTAT} • Всего вызовов: **{total_commands}**\n"
+                f"> {S_ManagerSTAT} • Чаще всего: `/{most_used}`\n"
+                f"> {S_ManagerSTAT} • Редко: `/{least_used}`\n"
+                f"> {S_ManagerSTAT} • Уникальных: **{len(bot.command_usage)}**"
             ),
             inline=True
         )
     
     # Информация о библиотеках
     embed.add_field(
-        name="Other",
+        name=f"> {B_InfoSTAT} • Other",
         value=(
-            f"Python ver: **{platform.python_version()}**\n"
-            f"discord.py ver: **{discord.__version__}**\n"
-            f"Servers added: **{len(bot.guilds)}**\n"
-            f"Commands: **{len(bot.tree.get_commands())}**"
+            f"> {S_ManagerSTAT} • Python ver: **{platform.python_version()}**\n"
+            f"> {S_ManagerSTAT} • discord.py ver: **{discord.__version__}**\n"
+            f"> {S_ManagerSTAT} • Servers added: **{len(bot.guilds)}**\n"
+            f"> {S_ManagerSTAT} • Commands: **{len(bot.tree.get_commands())}**"
         ),
         inline=True
     )
     
     # Uptime подробно
     if days > 0:
-        uptime_detail = f"{days} дней, {hours} часов, {minutes} минут"
+        uptime_detail = f"> {days} дней, {hours} часов, {minutes} минут"
     else:
-        uptime_detail = f"{hours} часов, {minutes} минут, {seconds} секунд"
+        uptime_detail = f"> {hours} часов, {minutes} минут, {seconds} секунд"
     
     embed.add_field(
-        name=f"{B_BotIcon} Время работы",
+        name=f"{B_BotSTAT} • Время работы",
         value=uptime_detail,
         inline=False
     )
     
-    embed.set_footer(
-        text=f"Запросил: {interaction.user.name} | Запущен: {bot.start_time.strftime('%d.%m.%Y %H:%M')}",
-        icon_url=interaction.user.display_avatar.url
-    )
+#    embed.set_footer(
+#        text=f"Запросил: {interaction.user.name} | Запущен: {bot.start_time.strftime('%d.%m.%Y %H:%M')}",
+#        icon_url=interaction.user.display_avatar.url
+#    )
     
     await interaction.response.send_message(embed=embed)
     
@@ -1570,38 +1516,8 @@ async def autorole(interaction: discord.Interaction, role: Optional[discord.Role
     # Логируем использование
     bot.command_usage["autorole"] = bot.command_usage.get("autorole", 0) + 1
 
-@bot.tree.command(name="setwelcome", description="канал для велкома")
-@app_commands.describe(channel="канал (оставь пустым чтобы выключить)")
-@ace_check() # чек на то, он для разрабов или нет [по айди в коде]
-@cmd_check() # чек включен ли он или нет
-async def set_welcome(interaction: discord.Interaction, channel: Optional[discord.TextChannel] = None):
-    config = load_config()
-    config["welcome_channel_id"] = channel.id if channel else None
-    save_config(config)
-    
-    if channel:
-        embed = discord.Embed(
-            title="🎉 Приветственные сообщения",
-            description=f"✅ **Приветствия включены!**\n\nТеперь новые участники будут получать приветствие в канале {channel.mention}.",
-            color=0xf6d98e
-        )
-        status = f"**{channel.mention}**"
-    else:
-        embed = discord.Embed(
-            title="🎉 Приветственные сообщения",
-            description="✅ **Приветствия выключены**\n\nНовые участники не будут получать приветственные сообщения.",
-            color=0xf6d98e
-        )
-        status = "**выключен**"
-    
-    await interaction.response.send_message(embed=embed, ephemeral=True)
-    logger.info(f"[🟩] setwelcome: {status} от {interaction.user}")  
-    
-    # Логируем использование
-    bot.command_usage["setwelcome"] = bot.command_usage.get("setwelcome", 0) + 1
-
-@bot.tree.command(name="setmcstats", description="канал для MC статистики")
-@app_commands.describe(channel="канал для статистики")
+@bot.tree.command(name="setmcstats", description="Set minecraft stat channel")
+@app_commands.describe(channel="/setmcstats <#channel>")
 @ace_check() # чек на то, он для разрабов или нет [по айди в коде]
 @cmd_check() # чек включен ли он или нет
 async def set_mc_stats(interaction: discord.Interaction, channel: discord.TextChannel):
@@ -1626,8 +1542,8 @@ async def set_mc_stats(interaction: discord.Interaction, channel: discord.TextCh
     # Логируем использование
     bot.command_usage["setmcstats"] = bot.command_usage.get("setmcstats", 0) + 1
 
-@bot.tree.command(name="mcsetip", description="мц сервер IP")
-@app_commands.describe(ip_port="ip:port")
+@bot.tree.command(name="mcsetip", description="exacly")
+@app_commands.describe(ip_port="/mcsetip ip:port [By default - Aloris]")
 @ace_check() # чек на то, он для разрабов или нет [по айди в коде]
 @cmd_check() # чек включен ли он или нет
 async def mc_set_ip(interaction: discord.Interaction, ip_port: str):
